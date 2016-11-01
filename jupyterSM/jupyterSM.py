@@ -16,8 +16,7 @@ class NB_Extractor:
         self.sm_psbl_params = ('input', 'output', 'workdir', 
                                'message', 'threads', 'resources', 
                                'version', 'snakemake', 'rule', 'include', 
-                               'ni', 'params', 'log', 'benchmark', 'run', 
-                               'shell')
+                               'ni', 'params', 'log', 'benchmark', 'run')
         self.sm_params = {'input': ["'{}'".format(self.nb_file)]}
         self.nb = nbformat.read(nb_file, nbformat.NO_CONVERT)
 
@@ -31,7 +30,7 @@ class NB_Extractor:
         code = 'source' string from code cell
         """
         code = code.split('\n')
-        rex_input = re.compile('\s*#\s*snakemake:\s*')
+        rex_input = re.compile('\s*#\s*snakemake::\s*')
         rex_split = re.compile('\s*=\s*')
         for i in range(len(code)):
             if rex_input.match(code[i]):
@@ -53,13 +52,19 @@ class NB_Extractor:
         """
         sp = spacing 
         """
+        # rule header
         print('rule {}_run:'.format(self.sm_rule))
+        # rule params 
         for p in self.sm_psbl_params:
             try:
                 ps = ',\n'.join([sp*2+x for x in self.sm_params[p]]) 
                 print('{}{}:\n{}'.format(sp, p, ps))
             except KeyError:
                 pass
+        # shell
+        print('{}shell:'.format(sp))
+        print('{}\'{}\''.format(sp*2, '{activate}; '))
+        print('{}\'jupyter nbconvert --to notebook --execute {} --ExecutePreprocessor.kernel_name=python\''.format(sp*2, self.nb_file))
         
         
 
