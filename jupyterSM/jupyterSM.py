@@ -10,6 +10,22 @@ import nbformat
 
 
 class NB_Extractor:
+    def __init__(self, nb_files, conda=None):
+        self.nb_files = nb_files
+        self.conda = conda
+        
+    def to_snakefile(self):
+        # activate
+        if self.conda:
+            print('conda_env = "{}"\n'.format(self.conda))
+        # snakemake rul
+        for F in self.nb_files:
+            nbe = _NB_Extractor(F)
+            nbe.extract()
+            nbe.to_snakefile()
+        
+
+class _NB_Extractor():
     def __init__(self, nb_file):
         self.nb_file = nb_file
         self.sm_rule = os.path.splitext(os.path.basename(nb_file))[0]
@@ -31,20 +47,33 @@ class NB_Extractor:
         """
         code = code.split('\n')
         rex_input = re.compile('\s*#\s*snakemake::\s*')
+        rex_space = re.compile('\s+') 
         rex_split = re.compile('\s*=\s*')
         for i in range(len(code)):
             if rex_input.match(code[i]):
                 # parsing comment
                 comm = re.split(rex_input, code[i], maxsplit=1)
-                param = comm[1].lower()
-                # parsing values 
-                vals = re.split(rex_split, code[i+1], maxsplit=1)
-                # adding to SM params
-                try:
-                    self.sm_params[param].append(vals[1])
-                except KeyError:
-                    self.sm_params[param] = [vals[1]]
-
+                comm_params = re.split(rex_space, comm[1])
+                sm_grammar = comm_params[0].lower()
+                comm_params = comm_params[1:]
+                if sm_grammar in ('input','output'):
+                    # parsing next line 
+                    comm_params = re.split(rex_split, code[i+1], maxsplit=1)
+                    try:
+                        self.sm_params[sm_grammar].append(comm_params[1])
+                    except KeyError:
+                        self.sm_params[sm_grammar] = [comm_params[1]]
+                elif sm_grammar in ('params'):
+                    # parsing params from comment
+                    for x in comm_params:
+                        k,v = re.split(rex_split, x, maxsplit=1)
+                        try:
+                            self.sm_params[sm_grammar][k] = v
+                        except KeyError:
+                            self.sm_params[sm_grammar] = {k:v}
+                else:
+                    self.sm_params[sm_grammar] = comm_params
+                        
     def to_json(self):
         json.dump(self.sm_params, sys.stdout)
 
@@ -55,21 +84,40 @@ class NB_Extractor:
         # rule header
         print('rule {}_run:'.format(self.sm_rule))
         # rule params 
-        for p in self.sm_psbl_params:
+        for pp in self.sm_psbl_params:
             try:
-                ps = ',\n'.join([sp*2+x for x in self.sm_params[p]]) 
-                print('{}{}:\n{}'.format(sp, p, ps))
+                params = self.sm_params[pp]
             except KeyError:
-                pass
+                continue
+            # snakemake grammer header
+            print('{}{}:'.format(sp, pp))
+            # values for snakemake grammer
+            try:
+                j = []
+                for k,v in params.items():
+                    j.append('{}{}={}'.format(sp*2, k, v))
+                print(',\n'.join(j))
+            except AttributeError:
+                j = ',\n'.join([sp*2+x for x in params])
+                print(j)
+                                    
         # shell
-        print('{}shell:'.format(sp))
-        print('{}\'{}\''.format(sp*2, '{activate}; '))
-        print('{}\'jupyter nbconvert --to notebook --execute {} --ExecutePreprocessor.kernel_name=python\''.format(sp*2, self.nb_file))
+        try:
+            x = self.sm_params['params']['conda_env']
+            conda_env = 'params.conda_env'
+        except KeyError:
+            conda_env = 'conda_env'            
+        print('{}shell:'.format(sp))        
+        print('{}\'source activate {}; \''.format(sp*2, '{' + conda_env + '}'))
+        print('{}\'jupyter nbconvert '
+              '--to notebook --execute {} '
+              ' --ExecutePreprocessor.kernel_name=python '
+              '--inplace\''.format(sp*2, self.nb_file))
         
         
 
 if __name__ == '__main__':
     nb_file = '/ebio/abt3_projects/small_projects/nyoungblut/dev/jupyterSM/notebooks/NB1.ipynb'
-    nbe = NB_Extractor(nb_file)
+    nbe = NB_Extractor(nb_file, conda=None)
     nbe.extract()
     nbe.to_snakefile()
