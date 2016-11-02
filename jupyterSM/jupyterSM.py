@@ -5,6 +5,7 @@ from __future__ import print_function
 import os
 import sys
 import re
+import shlex
 import json
 import nbformat
 
@@ -53,9 +54,13 @@ class _NB_Extractor():
             if rex_input.match(code[i]):
                 # parsing comment
                 comm = re.split(rex_input, code[i], maxsplit=1)
-                comm_params = re.split(rex_space, comm[1])
-                sm_grammar = comm_params[0].lower()
-                comm_params = comm_params[1:]
+                x = re.split(rex_space, comm[1], maxsplit=1)
+                sm_grammar = x[0].lower()
+                try: 
+                    comm_params = shlex.split(x[1])
+                except IndexError:
+                    comm_params = []
+                # appending params & values
                 if sm_grammar in ('input','output'):
                     # parsing next line 
                     comm_params = re.split(rex_split, code[i+1], maxsplit=1)
@@ -67,10 +72,14 @@ class _NB_Extractor():
                     # parsing params from comment
                     for x in comm_params:
                         k,v = re.split(rex_split, x, maxsplit=1)
+                        v = '"{}"'.format(v)
                         try:
                             self.sm_params[sm_grammar][k] = v
                         except KeyError:
                             self.sm_params[sm_grammar] = {k:v}
+                elif sm_grammar in ('message'):
+                    comm_params = ['"{}"'.format(x) for x in comm_params]
+                    self.sm_params[sm_grammar] = comm_params
                 else:
                     self.sm_params[sm_grammar] = comm_params
                         

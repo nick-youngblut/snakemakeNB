@@ -10,7 +10,6 @@ scriptDir = os.path.dirname(__file__)
 libDir = os.path.join(scriptDir, 'jupyterSM')
 sys.path.append(libDir)
 from jupyterSM import jupyterSM
-#from jupyterSM import NB_Extractor
 
 
 def parse_args():
