@@ -5,7 +5,6 @@ B0;95;0c.DS_Store
 # Distribution / packaging
 .Python
 env/
-bin/
 build/
 develop-eggs/
 dist/
