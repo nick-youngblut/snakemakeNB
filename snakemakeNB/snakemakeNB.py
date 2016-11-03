@@ -49,7 +49,7 @@ class _NB_Extractor():
         """
         code = code.split('\n')
         rex_input = re.compile('\s*#+\s*snakemake::\s*')
-        rex_space = re.compile('\s+') 
+        rex_space = re.compile('\s+')
         rex_split = re.compile('\s*=\s*')
         for i in range(len(code)):
             if rex_input.match(code[i]):
@@ -64,6 +64,14 @@ class _NB_Extractor():
                 # appending params & values
                 if sm_grammar in ('input','output'):
                     # parsing next line 
+                    ## checking for input/output line
+                    try:
+                        x = code[i+1]
+                    except IndexError:
+                        continue
+                    if rex_input.match(code[i+1]) or code[i+1].strip() == '':
+                        continue
+                    ## parsing input/output line
                     comm_params = re.split(rex_split, code[i+1], maxsplit=1)
                     try:
                         self.sm_params[sm_grammar].append(comm_params[1])

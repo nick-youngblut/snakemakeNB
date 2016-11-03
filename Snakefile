@@ -26,3 +26,14 @@ rule NB2_ipynb:
         'source activate {params.conda_env}; '
         'jupyter nbconvert --to notebook --execute notebooks/NB2.ipynb  --ExecutePreprocessor.kernel_name=python --inplace'
 
+rule NB3_ipynb:
+    input:
+        '/ebio/abt3_projects/small_projects/nyoungblut/dev/snakemake-nb/data/mtcars_n.txt'
+    message:
+        "this is a message"
+    params:
+        conda_env="py3_ley0.2"
+    shell:
+        'source activate {params.conda_env}; '
+        'jupyter nbconvert --to notebook --execute notebooks/NB3.ipynb  --ExecutePreprocessor.kernel_name=python --inplace'
+

@@ -9,7 +9,7 @@ Create snakemake rules from Jupyter/Ipython Notebook files.
 - [Installation and updating](#installation-and-updating)
 - [Usage](#usage)
 - [Changelog](#changelog)
-
+- [ToDo](#todo)
 
 ## Examples
 
@@ -38,3 +38,10 @@ pip install -e git+https://github.com/nick-youngblut/snakemakeNB#egg=snakemakeNB
 ## Changelog
 
 [[top](#sections)]
+
+
+
+## ToDo
+
+[ ] Determining all terminal files from notebooks to create 'all' rule 
+[ ] Adding Notebook rules to existing Snakefile
