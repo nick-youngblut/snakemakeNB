@@ -34,7 +34,8 @@ class _NB_Extractor():
                                'message', 'threads', 'resources', 
                                'version', 'snakemake', 'rule', 'include', 
                                'ni', 'params', 'log', 'benchmark', 'run')
-        self.sm_params = {'input': ["'{}'".format(self.nb_file)]}
+        #self.sm_params = {'input': ["'{}'".format(self.nb_file)]}
+        self.sm_params = {}
         self.nb = nbformat.read(nb_file, nbformat.NO_CONVERT)
 
     def extract(self):
