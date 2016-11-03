@@ -126,7 +126,6 @@ class _NB_Extractor():
         
 
 if __name__ == '__main__':
-    nb_file = '/ebio/abt3_projects/small_projects/nyoungblut/dev/jupyterSM/notebooks/NB1.ipynb'
+    nb_file = '../notebooks/NB1.ipynb'
     nbe = NB_Extractor(nb_file, conda=None)
-    nbe.extract()
     nbe.to_snakefile()
