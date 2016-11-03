@@ -122,6 +122,7 @@ class _NB_Extractor():
               '--to notebook --execute {} '
               ' --ExecutePreprocessor.kernel_name=python '
               '--inplace\''.format(sp*2, self.nb_file))
+        print('')
         
         
 

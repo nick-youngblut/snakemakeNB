@@ -17,7 +17,7 @@ setup(
     author_email='nyoungb2@gmail.com',
     url='https://github.com/nick-youngblut/jupyterSM',
     packages=find_packages(exclude=[]),
-    scripts=['bin/snakemake-nb.py'],
+    scripts=['bin/snakemake-nb'],
     install_requires=install_reqs,
     long_description="""
     Create snakemake rules to batch run Jupyter/Ipython Notebooks
