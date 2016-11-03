@@ -47,7 +47,7 @@ class _NB_Extractor():
         code = 'source' string from code cell
         """
         code = code.split('\n')
-        rex_input = re.compile('\s*#\s*snakemake::\s*')
+        rex_input = re.compile('\s*#+\s*snakemake::\s*')
         rex_space = re.compile('\s+') 
         rex_split = re.compile('\s*=\s*')
         for i in range(len(code)):
