@@ -91,7 +91,7 @@ class _NB_Extractor():
         sp = spacing 
         """
         # rule header
-        print('rule {}_run:'.format(self.sm_rule))
+        print('rule {}_ipynb:'.format(self.sm_rule))
         # rule params 
         for pp in self.sm_psbl_params:
             try:
